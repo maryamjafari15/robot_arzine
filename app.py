@@ -5,9 +5,12 @@ from emoji import emojize
 import re
 import os
 from dotenv import load_dotenv
+from aiohttp import web
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN_bot")
+WEBHOOK_SECRET = "secret123"
+BASE_URL = os.getenv("WEBHOOK_URL")
 
 main_keyboard = ReplyKeyboardMarkup(
     [["💵قیمت دلار"],["💶قیمت یورو"],["💵قیمت لیر ترکیه"],["💷قیمت پوند انگلیس"],["💰قیمت طلا و سکه"], ["📘راهنما"]],
@@ -104,16 +107,29 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print("هیچ پیام متنی دریافت نشد.")
 
 
+async def main():
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.add_handler(CallbackQueryHandler(handle_gold_buttons ,  pattern="^(geram18|sekee|nim|rob)$"))
+    app.add_handler(CallbackQueryHandler(handle_button , pattern="^start_bot$"))
 
-app = ApplicationBuilder().token(TOKEN).build()
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-app.add_handler(CallbackQueryHandler(handle_gold_buttons ,  pattern="^(geram18|sekee|nim|rob)$"))
-app.add_handler(CallbackQueryHandler(handle_button , pattern="^start_bot$"))
+    await app.bot.set_webhook(
+        url=f"{BASE_URL}/{WEBHOOK_SECRET}"
+    )
 
+    web_app = web.Application()
+    web_app.add_routes([
+        web.post(f"/{WEBHOOK_SECRET}", app.webhook_handler),
+        web.get("/", lambda request: web.Response(text="Bot is running!"))
+    ])
 
+    print("🔗 Webhook is active")
+    web.run_app(web_app, port=8080)
 
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
 
 
 print("robot is active")
-app.run_polling()

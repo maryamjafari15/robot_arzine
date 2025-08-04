@@ -4,3 +4,4 @@ beautifulsoup4==4.13.4
 lxml==6.0.0
 python-dotenv==1.0.1
 selenium==4.34.2
+aiohttp
