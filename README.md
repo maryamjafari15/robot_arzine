@@ -31,15 +31,5 @@ It uses a web scraper to fetch prices and responds to user commands via Telegram
 2. Install dependencies:
    ```bash
    pip install -r requirements.txt
-3. Create a .env file in the root directory:
-   ```bash
-   ```ثرد
-   TOKEN_bot=your_telegram_bot_token
-   WEBHOOK_URL=https://your-render-app.onrender.com
-4. Run the bot locally (for testing):
- ```bash
-   ```ثرد
-  python bot.py
-   
 
-     python bot.py
+
